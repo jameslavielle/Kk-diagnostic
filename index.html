@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>K&K Revenue Intelligence - Diagnostic Tool</title>
+
+<style>
+  :root {
+    --crimson: #7B0000;
+    --crimson-light: #9B1111;
+    --crimson-pale: #FFF5F5;
+    --ink: #1A1A1A;
+    --ink-mid: #444444;
+    --ink-light: #888888;
+    --border: #E5E0DC;
+    --bg: #FAF8F6;
+    --white: #FFFFFF;
+    --gold: #B8860B;
+    --gold-light: #FFF8E7;
+    --green: #1A5C2E;
+    --green-light: #F0FAF3;
+    --blue: #1A3A5C;
+    --blue-light: #EEF4FF;
+    --card-shadow: 0 2px 16px rgba(26,26,26,0.08);
+    --card-shadow-hover: 0 8px 32px rgba(123,0,0,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--crimson);
+    padding: 20px 20px 18px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(123,0,0,0.3);
+  }
+  .header-inner {
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo-block {}
+  .logo-name {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 18px;
+    color: #FFFFFF;
+    letter-spacing: 0.02em;
+  }
+  .logo-sub {
+    font-size: 10px;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-top: 1px;
+  }
+  .header-badge {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.85);
+    letter-spacing: 0.06em;
+  }
+
+  /* ── MAIN CONTAINER ── */
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 16px 80px;
+  }
+
+  /* ── INTRO STRIP ── */
+  .intro-strip {
+    background: var(--ink);
+    margin: 0 -16px;
+    padding: 16px 24px;
+    text-align: center;
+  }
+  .intro-strip p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.75);
+    line-height: 1.6;
+  }
+  .intro-strip strong {
+    color: #FFFFFF;
+  }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--crimson);
+    margin: 28px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--white);
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+    transition: box-shadow 0.2s ease;
+  }
+  .card:focus-within {
+    box-shadow: var(--card-shadow-hover);
+    border-color: rgba(123,0,0,0.2);
+  }
+
+  /* ── TOGGLE ── */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    background: var(--white);
+    border-radius: 14px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+  .toggle-label {
+    flex: 1;
+  }
+  .toggle-label-main {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .toggle-label-sub {
+    font-size: 11px;
+    color: var(--ink-light);
+    margin-top: 2px;
+  }
+  .toggle-switch {
+    position: relative;
+    width: 50px;
+    height: 28px;
+    flex-shrink: 0;
+  }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute;
+    inset: 0;
+    background: #D0CBC6;
+    border-radius: 28px;
+    cursor: pointer;
+    transition: 0.25s;
+  }
+  .toggle-slider::before {
+    content: '';
+    position: absolute;
+    width: 22px; height: 22px;
+    left: 3px; top: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: 0.25s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+  input:checked + .toggle-slider { background: var(--crimson); }
+  input:checked + .toggle-slider::before { transform: translateX(22px); }
+
+  /* ── INPUT FIELDS ── */
+  .input-group {
+    margin-bottom: 0;
+  }
+  .input-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-mid);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .input-hint {
+    font-size: 11px;
+    color: var(--ink-light);
+    font-weight: 400;
+  }
+  .input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .input-wrap .prefix,
+  .input-wrap .suffix {
+    position: absolute;
+    font-size: 20px;
+    font-weight: 300;
+    color: var(--ink-light);
+    pointer-events: none;
+  }
+  .input-wrap .prefix { left: 14px; }
+  .input-wrap .suffix { right: 14px; }
+  .input-wrap input[type="number"] {
+    width: 100%;
+    padding: 14px 40px 14px 14px;
+    font-size: 26px;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 400;
+    color: var(--ink);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    -moz-appearance: textfield;
+    appearance: textfield;
+    text-align: right;
+    padding-right: 36px;
+  }
+  .input-wrap.has-prefix input[type="number"] {
+    padding-left: 32px;
+    text-align: left;
+  }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+  input[type="number"]:focus {
+    border-color: var(--crimson);
+    background: #FFFCFC;
+  }
+  .input-wrap .prefix { font-size: 22px; top: 50%; transform: translateY(-50%); }
+  .input-wrap .suffix { font-size: 18px; top: 50%; transform: translateY(-50%); }
+
+  /* ── CHAIN DIAGRAM ── */
+  .chain-card {
+    background: var(--ink);
+    border-radius: 14px;
+    padding: 20px 16px;
+    box-shadow: 0 4px 20px rgba(26,26,26,0.15);
+    border: none;
+    overflow-x: auto;
+  }
+  .chain-title {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 16px;
+  }
+  .chain-nodes {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    min-width: 480px;
+  }
+  .chain-node {
+    flex: 1;
+    text-align: center;
+    position: relative;
+  }
+  .chain-node-box {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 10px 4px 8px;
+    transition: all 0.3s ease;
+  }
+  .chain-node-box.active {
+    background: rgba(123,0,0,0.4);
+    border-color: rgba(180,40,40,0.6);
+  }
+  .chain-node-box.opportunity {
+    background: rgba(184,134,11,0.2);
+    border-color: rgba(184,134,11,0.5);
+    animation: pulse-gold 2s ease-in-out infinite;
+  }
+  .chain-node-box.bottleneck {
+    background: rgba(123,0,0,0.35);
+    border-color: rgba(180,40,40,0.7);
+    animation: pulse-gold 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse-gold {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(184,134,11,0); }
+    50% { box-shadow: 0 0 0 4px rgba(184,134,11,0.15); }
+  }
+  .chain-node-count {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 20px;
+    color: #FFFFFF;
+    line-height: 1;
+    margin-bottom: 4px;
+    transition: all 0.4s ease;
+  }
+  .chain-node-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.45);
+  }
+  .chain-node-rate {
+    font-size: 10px;
+    color: rgba(255,255,255,0.3);
+    margin-top: 3px;
+  }
+  .chain-arrow {
+    width: 20px;
+    flex-shrink: 0;
+    text-align: center;
+    color: rgba(255,255,255,0.2);
+    font-size: 14px;
+    padding-bottom: 12px;
+  }
+  .chain-node-box.revenue {
+    background: rgba(26,92,46,0.3);
+    border-color: rgba(26,92,46,0.5);
+  }
+  .chain-node-count.revenue-amt {
+    font-size: 15px;
+    color: #6FCF97;
+  }
+
+  /* ── BIG NUMBER HERO ── */
+  .value-hero {
+    background: linear-gradient(135deg, var(--crimson) 0%, #4A0000 100%);
+    border-radius: 14px;
+    padding: 24px 20px;
+    text-align: center;
+    box-shadow: 0 6px 24px rgba(123,0,0,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  .value-hero::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+  .value-hero-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 6px;
+  }
+  .value-hero-number {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 56px;
+    color: #FFFFFF;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    transition: all 0.4s ease;
+  }
+  .value-hero-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 6px;
+  }
+
+  /* ── METRICS ROW ── */
+  .metrics-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .metric-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+  .metric-card.opportunity {
+    background: var(--crimson-pale);
+    border-color: rgba(123,0,0,0.15);
+  }
+  .metric-card.positive {
+    background: var(--green-light);
+    border-color: rgba(26,92,46,0.15);
+  }
+  .metric-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-light);
+    margin-bottom: 6px;
+  }
+  .metric-value {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 28px;
+    color: var(--ink);
+    line-height: 1;
+    transition: all 0.3s ease;
+  }
+  .metric-card.opportunity .metric-value { color: var(--crimson); }
+  .metric-card.positive .metric-value { color: var(--green); }
+  .metric-sub {
+    font-size: 11px;
+    color: var(--ink-light);
+    margin-top: 4px;
+  }
+
+  /* ── ANNUAL BANNER ── */
+  .annual-banner {
+    background: var(--gold-light);
+    border: 1px solid rgba(184,134,11,0.25);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .annual-banner-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--gold);
+  }
+  .annual-banner-value {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 32px;
+    color: var(--gold);
+    line-height: 1;
+    transition: all 0.3s ease;
+  }
+
+  /* ── DIAGNOSIS PANEL ── */
+  .diagnosis-panel {
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+  .diagnosis-header {
+    background: var(--ink);
+    padding: 14px 18px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.6);
+  }
+  .diagnosis-item {
+    background: var(--white);
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    transition: background 0.2s;
+  }
+  .diagnosis-item:last-child { border-bottom: none; }
+  .diagnosis-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+  .diagnosis-dot.red { background: var(--crimson); }
+  .diagnosis-dot.gold { background: var(--gold); }
+  .diagnosis-dot.green { background: var(--green); }
+  .diagnosis-item-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 3px;
+  }
+  .diagnosis-item-body {
+    font-size: 12px;
+    color: var(--ink-mid);
+    line-height: 1.5;
+  }
+  .diagnosis-item-body strong {
+    color: var(--crimson);
+  }
+  .diagnosis-empty {
+    background: var(--white);
+    padding: 24px 18px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--ink-light);
+  }
+
+  /* ── SIMULATOR ── */
+  .sim-card {
+    background: var(--blue-light);
+    border-radius: 14px;
+    padding: 20px;
+    border: 1px solid rgba(26,58,92,0.12);
+    box-shadow: var(--card-shadow);
+    margin-bottom: 12px;
+  }
+  .sim-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--blue);
+    margin-bottom: 4px;
+  }
+  .sim-sub {
+    font-size: 11px;
+    color: rgba(26,58,92,0.6);
+    margin-bottom: 18px;
+  }
+  .slider-group {
+    margin-bottom: 18px;
+  }
+  .slider-group:last-child { margin-bottom: 0; }
+  .slider-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .slider-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--blue);
+  }
+  .slider-val {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 20px;
+    color: var(--blue);
+    min-width: 60px;
+    text-align: right;
+  }
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    border-radius: 4px;
+    background: rgba(26,58,92,0.15);
+    outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--blue);
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(26,58,92,0.3);
+    transition: transform 0.15s;
+  }
+  input[type="range"]::-webkit-slider-thumb:active { transform: scale(1.2); }
+  .sim-result {
+    background: var(--blue);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .sim-result-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 2px;
+  }
+  .sim-result-value {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 30px;
+    color: #FFFFFF;
+    line-height: 1;
+    transition: all 0.3s ease;
+  }
+  .sim-result-delta {
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.12);
+    color: #FFFFFF;
+    transition: all 0.3s ease;
+  }
+  .sim-result-delta.positive { background: rgba(111,207,151,0.25); color: #6FCF97; }
+
+  /* ── SUMMARY CARD ── */
+  .summary-card {
+    background: var(--white);
+    border-radius: 14px;
+    padding: 22px 20px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+  .summary-title {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 20px;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .summary-sub {
+    font-size: 12px;
+    color: var(--ink-light);
+    margin-bottom: 18px;
+  }
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .summary-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .summary-row-label {
+    font-size: 13px;
+    color: var(--ink-mid);
+  }
+  .summary-row-value {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 20px;
+    color: var(--ink);
+  }
+  .summary-row-value.highlight { color: var(--crimson); }
+  .summary-row-value.positive { color: var(--green); }
+
+  /* ── REVENUE STRATEGY COMPARISON ── */
+  .comparison-card {
+    background: #1A1A1A;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(26,26,26,0.18);
+    margin-bottom: 12px;
+  }
+  .comparison-title {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 16px;
+  }
+  .comparison-scenarios {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .scenario-block {
+    border-radius: 10px;
+    padding: 14px 12px;
+  }
+  .scenario-block.scenario-a {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .scenario-block.scenario-b {
+    background: rgba(26,92,46,0.25);
+    border: 1px solid rgba(26,92,46,0.45);
+  }
+  .scenario-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+  .scenario-block.scenario-a .scenario-label { color: rgba(255,255,255,0.4); }
+  .scenario-block.scenario-b .scenario-label { color: #6FCF97; }
+  .scenario-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+  .scenario-detail {
+    font-size: 10px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+  .scenario-result {
+    font-size: 20px;
+    font-weight: 800;
+    color: #FFFFFF;
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+  .scenario-block.scenario-b .scenario-result { color: #6FCF97; }
+  .scenario-delta {
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+  }
+  .scenario-block.scenario-b .scenario-delta { color: rgba(111,207,151,0.7); }
+  .comparison-punch {
+    background: rgba(123,0,0,0.4);
+    border: 1px solid rgba(180,40,40,0.5);
+    border-radius: 10px;
+    padding: 14px 16px;
+    text-align: center;
+  }
+  .comparison-punch-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: #FFFFFF;
+    line-height: 1.5;
+    margin-bottom: 6px;
+  }
+  .comparison-punch-sub {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    font-style: italic;
+  }
+
+  /* ── FOOTER NOTE ── */
+  .footer-note {
+    text-align: center;
+    font-size: 11px;
+    color: var(--ink-light);
+    padding: 8px 0 0;
+    line-height: 1.6;
+  }
+  .footer-note strong {
+    color: var(--crimson);
+    font-weight: 600;
+  }
+
+  /* ── NUMBER FLIP ANIMATION ── */
+  .flip {
+    animation: numflip 0.3s ease;
+  }
+  @keyframes numflip {
+    0% { opacity: 0.4; transform: translateY(4px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── ESTIMATE SECTION ── */
+  .estimate-section {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.35s ease, opacity 0.35s ease;
+  }
+  .estimate-section.visible {
+    max-height: 200px;
+    opacity: 1;
+  }
+</style>
+
+</head>
+<body>
+
+<!-- HEADER -->
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo-block">
+      <div class="logo-name">K&K Revenue Intelligence</div>
+      <div class="logo-sub">Diagnostic Tool</div>
+    </div>
+    <div class="header-badge">Live Calculator</div>
+  </div>
+</header>
+
+<!-- INTRO -->
+
+<div class="intro-strip">
+  <p><strong>Enter your numbers below.</strong> This tool shows you exactly where revenue is moving through your business and where it is not.</p>
+</div>
+
+<div class="container">
+
+  <!-- SECTION: BUSINESS TYPE -->
+
+  <div class="section-label">Business Type</div>
+
+  <div class="toggle-row">
+    <div class="toggle-label">
+      <div class="toggle-label-main">Estimate Required Before Closing</div>
+      <div class="toggle-label-sub" id="toggle-sub-text">Off - Direct close (plumbing, wrecker, junk removal)</div>
+    </div>
+    <label class="toggle-switch">
+      <input type="checkbox" id="estimate-toggle">
+      <span class="toggle-slider"></span>
+    </label>
+  </div>
+
+  <!-- SECTION: INPUTS -->
+
+  <div class="section-label">Your Numbers</div>
+
+  <!-- Calls + Missed -->
+
+  <div class="card">
+    <div class="input-group">
+      <div class="input-label">
+        Monthly Inbound Calls
+        <span class="input-hint">Total calls received</span>
+      </div>
+      <div class="input-wrap">
+        <input type="number" id="total-calls" value="80" min="0" max="9999" inputmode="numeric">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="input-group">
+      <div class="input-label">
+        Missed Call Rate
+        <span class="input-hint">% that go unanswered</span>
+      </div>
+      <div class="input-wrap">
+        <input type="number" id="missed-rate" value="15" min="0" max="100" inputmode="numeric">
+        <span class="suffix">%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="input-group">
+      <div class="input-label">
+        Qualification Rate
+        <span class="input-hint">% of callers who are real buyers</span>
+      </div>
+      <div class="input-wrap">
+        <input type="number" id="qual-rate" value="60" min="0" max="100" inputmode="numeric">
+        <span class="suffix">%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estimate booking - conditional -->
+
+  <div class="estimate-section" id="estimate-section">
+    <div class="card">
+      <div class="input-group">
+        <div class="input-label">
+          Estimate Booking Rate
+          <span class="input-hint">% of qualified who book an estimate</span>
+        </div>
+        <div class="input-wrap">
+          <input type="number" id="booking-rate" value="55" min="0" max="100" inputmode="numeric">
+          <span class="suffix">%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="input-group">
+      <div class="input-label">
+        Close Rate
+        <span class="input-hint">% of qualified (or booked estimates) who become jobs</span>
+      </div>
+      <div class="input-wrap">
+        <input type="number" id="close-rate" value="50" min="0" max="100" inputmode="numeric">
+        <span class="suffix">%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="input-group">
+      <div class="input-label">
+        Average Job Value
+        <span class="input-hint">Revenue per completed job</span>
+      </div>
+      <div class="input-wrap has-prefix">
+        <span class="prefix">$</span>
+        <input type="number" id="avg-ticket" value="500" min="0" max="99999" inputmode="numeric">
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: VALUE PER CALL -->
+
+  <div class="section-label">Value Per Call</div>
+
+  <div class="value-hero">
+    <div class="value-hero-label">Each inbound call to your business is worth</div>
+    <div class="value-hero-number" id="value-per-call">$0</div>
+    <div class="value-hero-sub" id="vpc-formula">Avg Ticket × Qual Rate × Close Rate</div>
+  </div>
+
+  <!-- SECTION: REVENUE CHAIN -->
+
+  <div class="section-label">Revenue Chain</div>
+
+  <div class="chain-card">
+    <div class="chain-title">Live Conversion Flow</div>
+    <div class="chain-nodes">
+      <div class="chain-node">
+        <div class="chain-node-box" id="node-calls">
+          <div class="chain-node-count" id="nc-calls">80</div>
+          <div class="chain-node-label">Calls</div>
+        </div>
+      </div>
+      <div class="chain-arrow">›</div>
+      <div class="chain-node">
+        <div class="chain-node-box" id="node-answered">
+          <div class="chain-node-count" id="nc-answered">68</div>
+          <div class="chain-node-label">Answered</div>
+          <div class="chain-node-rate" id="nr-answered">85%</div>
+        </div>
+      </div>
+      <div class="chain-arrow">›</div>
+      <div class="chain-node">
+        <div class="chain-node-box" id="node-qual">
+          <div class="chain-node-count" id="nc-qual">41</div>
+          <div class="chain-node-label">Qualified</div>
+          <div class="chain-node-rate" id="nr-qual">60%</div>
+        </div>
+      </div>
+      <div class="chain-arrow">›</div>
+      <div class="chain-node" id="node-booked-wrap" style="display:none">
+        <div class="chain-node-box" id="node-booked">
+          <div class="chain-node-count" id="nc-booked">22</div>
+          <div class="chain-node-label">Booked</div>
+          <div class="chain-node-rate" id="nr-booked">55%</div>
+        </div>
+      </div>
+      <div class="chain-arrow" id="arrow-booked" style="display:none">›</div>
+      <div class="chain-node">
+        <div class="chain-node-box" id="node-closed">
+          <div class="chain-node-count" id="nc-closed">20</div>
+          <div class="chain-node-label">Closed</div>
+          <div class="chain-node-rate" id="nr-closed">50%</div>
+        </div>
+      </div>
+      <div class="chain-arrow">›</div>
+      <div class="chain-node">
+        <div class="chain-node-box revenue" id="node-revenue">
+          <div class="chain-node-count revenue-amt" id="nc-revenue">$10k</div>
+          <div class="chain-node-label">Revenue</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: OPPORTUNITY NUMBERS -->
+
+  <div class="section-label">Where Revenue Stands</div>
+
+  <div class="metrics-row">
+    <div class="metric-card opportunity">
+      <div class="metric-label">Revenue Not Captured</div>
+      <div class="metric-value" id="monthly-missed">$0</div>
+      <div class="metric-sub">from unanswered calls</div>
+    </div>
+    <div class="metric-card positive">
+      <div class="metric-label">Monthly Revenue</div>
+      <div class="metric-value" id="monthly-revenue">$0</div>
+      <div class="metric-sub">currently closing</div>
+    </div>
+  </div>
+
+  <div class="annual-banner">
+    <div>
+      <div class="annual-banner-label">Annual Revenue Slipping Through</div>
+      <div style="font-size:11px;color:rgba(184,134,11,0.7);margin-top:2px;">What this business is losing every year before a conversation happens</div>
+    </div>
+    <div class="annual-banner-value" id="annual-missed">$0</div>
+  </div>
+
+  <!-- SECTION: DIAGNOSIS -->
+
+  <div class="section-label">Diagnosis</div>
+
+  <div class="diagnosis-panel">
+    <div class="diagnosis-header">Revenue Chain Analysis</div>
+    <div id="diagnosis-body">
+      <div class="diagnosis-empty">Enter your numbers above to see the analysis.</div>
+    </div>
+  </div>
+
+  <!-- SECTION: SIMULATOR -->
+
+  <div class="section-label">Growth Simulator</div>
+
+  <div class="sim-card">
+    <div class="sim-title">See How Small Changes Impact Your Revenue</div>
+    <div class="sim-sub">Move the sliders to see the direct revenue impact. Every change is immediate.</div>
+
+
+<div class="slider-group">
+  <div class="slider-row">
+    <span class="slider-name">Missed Call Rate</span>
+    <span class="slider-val" id="sim-missed-val">5%</span>
+  </div>
+  <input type="range" id="sim-missed" min="0" max="50" value="5" step="1">
+</div>
+
+<div class="slider-group">
+  <div class="slider-row">
+    <span class="slider-name">Close Rate</span>
+    <span class="slider-val" id="sim-close-val">50%</span>
+  </div>
+  <input type="range" id="sim-close" min="10" max="95" value="50" step="1">
+</div>
+
+<div class="slider-group">
+  <div class="slider-row">
+    <span class="slider-name">Average Ticket</span>
+    <span class="slider-val" id="sim-ticket-val">$500</span>
+  </div>
+  <input type="range" id="sim-ticket" min="100" max="20000" value="500" step="50">
+</div>
+
+<div class="sim-result">
+  <div>
+    <div class="sim-result-label">Projected Monthly Revenue</div>
+    <div class="sim-result-value" id="sim-revenue">$0</div>
+  </div>
+  <div class="sim-result-delta" id="sim-delta">+$0</div>
+</div>
+
+
+  </div>
+
+  <!-- SECTION: REVENUE STRATEGY COMPARISON -->
+
+  <div class="section-label">Revenue Strategy Comparison</div>
+
+  <div class="comparison-card">
+    <div class="comparison-title">What Actually Moves Revenue More?</div>
+    <div class="comparison-scenarios">
+      <div class="scenario-block scenario-a">
+        <div class="scenario-label">Path A</div>
+        <div class="scenario-name">Add More Calls</div>
+        <div class="scenario-detail" id="comp-a-detail">+20 calls/month<br>Same missed rate<br>Same close rate</div>
+        <div class="scenario-result" id="comp-a-revenue">$0</div>
+        <div class="scenario-delta" id="comp-a-delta">+$0/mo</div>
+        <div class="scenario-detail" style="margin-top:8px;margin-bottom:0;color:rgba(255,100,100,0.6);">Requires marketing spend</div>
+      </div>
+      <div class="scenario-block scenario-b">
+        <div class="scenario-label">Path B</div>
+        <div class="scenario-name">Fix Existing Leaks</div>
+        <div class="scenario-detail" id="comp-b-detail">Same call volume<br>Missed calls: 5%<br>Close rate: +10%</div>
+        <div class="scenario-result" id="comp-b-revenue">$0</div>
+        <div class="scenario-delta" id="comp-b-delta">+$0/mo</div>
+        <div class="scenario-detail" style="margin-top:8px;margin-bottom:0;color:rgba(111,207,151,0.6);">No additional marketing spend</div>
+      </div>
+    </div>
+    <div class="comparison-punch">
+      <div class="comparison-punch-text" id="comp-punch">In most cases, fixing existing conversion points produces more revenue than adding new calls.</div>
+      <div class="comparison-punch-sub">Revenue growth without increasing marketing spend.</div>
+    </div>
+  </div>
+
+  <!-- SECTION: SUMMARY -->
+
+  <div class="section-label">Summary</div>
+
+  <div class="summary-card">
+    <div class="summary-title">Your Business, At a Glance</div>
+    <div class="summary-sub" id="summary-date">As calculated today</div>
+
+
+<div class="summary-row">
+  <span class="summary-row-label">Value per call</span>
+  <span class="summary-row-value" id="sum-vpc">$0</span>
+</div>
+<div class="summary-row">
+  <span class="summary-row-label">Calls answered monthly</span>
+  <span class="summary-row-value" id="sum-answered">0</span>
+</div>
+<div class="summary-row">
+  <span class="summary-row-label">Jobs closed monthly</span>
+  <span class="summary-row-value" id="sum-jobs">0</span>
+</div>
+<div class="summary-row">
+  <span class="summary-row-label">Current monthly revenue</span>
+  <span class="summary-row-value positive" id="sum-revenue">$0</span>
+</div>
+<div class="summary-row">
+  <span class="summary-row-label">Monthly uncaptured (missed calls)</span>
+  <span class="summary-row-value highlight" id="sum-missed">$0</span>
+</div>
+<div class="summary-row">
+  <span class="summary-row-label">Annual uncaptured opportunity</span>
+  <span class="summary-row-value highlight" id="sum-annual">$0</span>
+</div>
+
+
+  </div>
+
+  <div class="footer-note">
+    Calculations based on your inputs. Actuals may vary.<br>
+    <strong>K&K Revenue Intelligence</strong> · (918) 904-9762 · Claremore, OK
+  </div>
+
+</div>
+
+<script>
+  // ── HELPERS ──
+  const $ = id => document.getElementById(id);
+  const fmt = (n, decimals=0) => n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  const fmtDollar = (n) => {
+    if (n >= 1000000) return '$' + fmt(n/1000000, 1) + 'M';
+    if (n >= 10000) return '$' + fmt(n/1000, 1) + 'k';
+    return '$' + fmt(n);
+  };
+  const fmtDollarFull = (n) => '$' + fmt(Math.round(n));
+
+  function animateVal(el, newText) {
+    if (el.textContent !== newText) {
+      el.classList.remove('flip');
+      void el.offsetWidth;
+      el.textContent = newText;
+      el.classList.add('flip');
+    }
+  }
+
+  // ── TOGGLE ──
+  const estimateToggle = $('estimate-toggle');
+  const estimateSection = $('estimate-section');
+  const nodeBookedWrap = $('node-booked-wrap');
+  const arrowBooked = $('arrow-booked');
+
+  estimateToggle.addEventListener('change', () => {
+    const on = estimateToggle.checked;
+    $('toggle-sub-text').textContent = on
+      ? 'On - Estimate required (roofing, HVAC, restoration)'
+      : 'Off - Direct close (plumbing, wrecker, junk removal)';
+    if (on) {
+      estimateSection.classList.add('visible');
+      nodeBookedWrap.style.display = '';
+      arrowBooked.style.display = '';
+    } else {
+      estimateSection.classList.remove('visible');
+      nodeBookedWrap.style.display = 'none';
+      arrowBooked.style.display = 'none';
+    }
+    calculate();
+  });
+
+  // ── CORE CALC ──
+  function getVal(id, fallback = 0) {
+    const v = parseFloat($(id).value);
+    return isNaN(v) ? fallback : v;
+  }
+
+  function calculate() {
+    const totalCalls = getVal('total-calls', 80);
+    const missedPct = Math.min(getVal('missed-rate', 15), 100) / 100;
+    const qualPct = Math.min(getVal('qual-rate', 60), 100) / 100;
+    const closePct = Math.min(getVal('close-rate', 50), 100) / 100;
+    const ticket = getVal('avg-ticket', 500);
+    const estimateOn = estimateToggle.checked;
+    const bookingPct = estimateOn ? Math.min(getVal('booking-rate', 55), 100) / 100 : 1;
+
+    const answered = totalCalls * (1 - missedPct);
+    const qualified = answered * qualPct;
+    const booked = estimateOn ? qualified * bookingPct : qualified;
+    const closed = booked * closePct;
+    const monthlyRevenue = closed * ticket;
+    const missedCalls = totalCalls * missedPct;
+
+    // Value per call
+    let vpc;
+    if (estimateOn) {
+      vpc = ticket * qualPct * bookingPct * closePct;
+    } else {
+      vpc = ticket * qualPct * closePct;
+    }
+
+    const monthlyMissed = missedCalls * vpc;
+    const annualMissed = monthlyMissed * 12;
+
+    // ── UPDATE CHAIN ──
+    animateVal($('nc-calls'), fmt(Math.round(totalCalls)));
+    animateVal($('nc-answered'), fmt(Math.round(answered)));
+    animateVal($('nc-qual'), fmt(Math.round(qualified)));
+    animateVal($('nc-booked'), fmt(Math.round(booked)));
+    animateVal($('nc-closed'), fmt(Math.round(closed)));
+    animateVal($('nc-revenue'), fmtDollar(monthlyRevenue));
+    $('nr-answered').textContent = fmt((1-missedPct)*100, 0) + '%';
+    $('nr-qual').textContent = fmt(qualPct*100, 0) + '%';
+    $('nr-booked').textContent = fmt(bookingPct*100, 0) + '%';
+    $('nr-closed').textContent = fmt(closePct*100, 0) + '%';
+
+    // Highlight opportunity nodes + identify biggest bottleneck
+    var nodeIds = ['node-calls', 'node-answered', 'node-qual', 'node-closed'];
+    if (estimateOn) nodeIds.splice(3, 0, 'node-booked');
+    nodeIds.forEach(function(id) {
+      var n = $(id);
+      if (n) { n.classList.remove('opportunity'); n.classList.remove('bottleneck'); }
+    });
+
+    // Score each stage by revenue impact
+    var stageLosses = [
+      { id: 'node-calls', loss: missedCalls * vpc },
+      { id: 'node-qual', loss: (answered * (1 - qualPct)) * closePct * ticket },
+      { id: 'node-closed', loss: booked * Math.max(0, 0.65 - closePct) * ticket },
+    ];
+    if (estimateOn) stageLosses.push({ id: 'node-booked', loss: qualified * (1 - bookingPct) * closePct * ticket });
+
+    stageLosses.sort(function(a, b) { return b.loss - a.loss; });
+
+    if (missedPct > 0.1) $('node-calls').classList.add('opportunity');
+    if (qualPct < 0.5) $('node-qual').classList.add('opportunity');
+    if (estimateOn && bookingPct < 0.5) $('node-booked').classList.add('opportunity');
+    if (closePct < 0.5) $('node-closed').classList.add('opportunity');
+
+    // Mark the single biggest bottleneck
+    if (stageLosses[0].loss > 0) {
+      var btNode = $(stageLosses[0].id);
+      if (btNode) btNode.classList.add('bottleneck');
+    }
+
+    // ── VALUE PER CALL ──
+    animateVal($('value-per-call'), fmtDollarFull(vpc));
+    $('vpc-formula').textContent = estimateOn
+      ? `$${fmt(ticket)} ticket × ${fmt(qualPct*100,0)}% qual × ${fmt(bookingPct*100,0)}% booking × ${fmt(closePct*100,0)}% close`
+      : `$${fmt(ticket)} ticket × ${fmt(qualPct*100,0)}% qual × ${fmt(closePct*100,0)}% close`;
+
+    // ── METRICS ──
+    animateVal($('monthly-missed'), fmtDollarFull(monthlyMissed));
+    animateVal($('monthly-revenue'), fmtDollarFull(monthlyRevenue));
+    animateVal($('annual-missed'), fmtDollarFull(annualMissed));
+
+    // ── REVENUE STRATEGY COMPARISON ──
+    const addedCalls = 20;
+    const pathATotal = totalCalls + addedCalls;
+    const pathAAnswered = pathATotal * (1 - missedPct);
+    const pathAQual = pathAAnswered * qualPct;
+    const pathABooked = estimateOn ? pathAQual * bookingPct : pathAQual;
+    const pathAClosed = pathABooked * closePct;
+    const pathARevenue = pathAClosed * ticket;
+    const pathADelta = pathARevenue - monthlyRevenue;
+
+    const pathBMissed = Math.min(missedPct, 0.05);
+    const pathBClose = Math.min(closePct + 0.10, 0.95);
+    const pathBAnswered = totalCalls * (1 - pathBMissed);
+    const pathBQual = pathBAnswered * qualPct;
+    const pathBBooked = estimateOn ? pathBQual * bookingPct : pathBQual;
+    const pathBClosed = pathBBooked * pathBClose;
+    const pathBRevenue = pathBClosed * ticket;
+    const pathBDelta = pathBRevenue - monthlyRevenue;
+
+    const compBMissedStr = missedPct <= 0.05 ? 'Missed rate: already at 5%' : 'Missed rate: ' + fmt(missedPct*100,0) + '% \u2192 5%';
+    const compBCloseStr = 'Close rate: ' + fmt(closePct*100,0) + '% \u2192 ' + fmt(pathBClose*100,0) + '%';
+
+    $('comp-a-detail').innerHTML = '+' + addedCalls + ' calls/month<br>Same missed rate: ' + fmt(missedPct*100,0) + '%<br>Same close rate: ' + fmt(closePct*100,0) + '%';
+    $('comp-b-detail').innerHTML = 'Same call volume<br>' + compBMissedStr + '<br>' + compBCloseStr;
+    animateVal($('comp-a-revenue'), fmtDollarFull(pathARevenue));
+    animateVal($('comp-b-revenue'), fmtDollarFull(pathBRevenue));
+    animateVal($('comp-a-delta'), '+' + fmtDollarFull(pathADelta) + '/mo');
+    animateVal($('comp-b-delta'), '+' + fmtDollarFull(pathBDelta) + '/mo');
+
+    const punchEl = $('comp-punch');
+    if (pathBDelta > pathADelta) {
+      const diff = pathBDelta - pathADelta;
+      punchEl.textContent = 'Fixing existing conversion points generates ' + fmtDollarFull(diff) + '/mo more than adding ' + addedCalls + ' calls \u2014 without spending anything on marketing.';
+    } else if (pathADelta > pathBDelta) {
+      punchEl.textContent = 'At current conversion rates, adding calls outperforms fixing leaks. But fixing leaks first would make every additional call worth more.';
+    } else {
+      punchEl.textContent = 'In most cases, fixing existing conversion points produces more revenue than adding new calls \u2014 without spending anything on marketing.';
+    }
+
+    // ── SUMMARY ──
+    const now = new Date();
+    $('summary-date').textContent = 'Each call is worth ' + fmtDollarFull(vpc) + ' · ' + now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    animateVal($('sum-vpc'), fmtDollarFull(vpc));
+    animateVal($('sum-answered'), fmt(Math.round(answered)));
+    animateVal($('sum-jobs'), fmt(Math.round(closed)));
+    animateVal($('sum-revenue'), fmtDollarFull(monthlyRevenue));
+    animateVal($('sum-missed'), fmtDollarFull(monthlyMissed));
+    animateVal($('sum-annual'), fmtDollarFull(annualMissed));
+
+    // ── DIAGNOSIS ──
+    buildDiagnosis(missedPct, qualPct, bookingPct, closePct, estimateOn, missedCalls, monthlyMissed, annualMissed, vpc, totalCalls, ticket);
+
+    // ── SIMULATOR SYNC ──
+    // Clamp sliders so they can ONLY move toward better outcomes.
+    // Missed call rate: max = baseline (can only go DOWN = improvement)
+    // Close rate: min = baseline (can only go UP = improvement)
+    // Ticket: min = baseline (can only go UP = improvement)
+    var baselineMissed = Math.round(missedPct * 100);
+    var baselineClose = Math.round(closePct * 100);
+    var baselineTicket = ticket;
+
+    // Set missed call slider: starts at baseline, max = baseline, min = 0
+    var smEl = $('sim-missed');
+    smEl.min = 0;
+    smEl.max = baselineMissed;
+    smEl.value = baselineMissed;
+    $('sim-missed-val').textContent = baselineMissed + '%';
+
+    // Set close rate slider: starts at baseline, min = baseline, max = 95
+    var scEl = $('sim-close');
+    scEl.min = baselineClose;
+    scEl.max = 95;
+    scEl.value = baselineClose;
+    $('sim-close-val').textContent = baselineClose + '%';
+
+    // Set ticket slider: starts at baseline, min = baseline, max = 20000
+    var stEl = $('sim-ticket');
+    stEl.min = baselineTicket;
+    stEl.max = 20000;
+    stEl.value = baselineTicket;
+    $('sim-ticket-val').textContent = '$' + fmt(baselineTicket);
+
+    // Store baseline for delta calculation
+    window._baseline = { monthlyRevenue: monthlyRevenue, totalCalls: totalCalls, qualPct: qualPct, bookingPct: bookingPct, estimateOn: estimateOn, ticket: ticket, missedPct: missedPct, closePct: closePct };
+    updateSimulator();
+
+
+  }
+
+  // ── DIAGNOSIS ──
+  function buildDiagnosis(missedPct, qualPct, bookingPct, closePct, estimateOn, missedCalls, monthlyMissed, annualMissed, vpc, totalCalls, ticket) {
+
+    var answered = totalCalls * (1 - missedPct);
+    var qualified = answered * qualPct;
+    var unqualified = answered * (1 - qualPct);
+    var booked = estimateOn ? qualified * bookingPct : qualified;
+    var unbooked = estimateOn ? qualified * (1 - bookingPct) : 0;
+    var annualMissedLoss = missedCalls * vpc * 12;
+
+    // ── DOLLAR LOSS PER STAGE ──
+    var missedLoss = missedCalls * vpc;
+    var qualLoss = unqualified * closePct * ticket;
+    var bookingLoss = estimateOn ? unbooked * closePct * ticket : 0;
+    var targetClose = 0.65;
+    var closeLoss = booked * Math.max(0, targetClose - closePct) * ticket;
+
+    // ── FIND PRIMARY LEAK BY WEIGHTED DOLLAR AMOUNT ──
+    // Fixability weight reflects how actionable each stage is.
+    // Missed calls and close rate are fastest to fix.
+    // Qualification rate is hard to control - only surfaces as primary
+    // if the rate is severely low (under 40%) AND the dollar loss is dominant.
+    var qualWeight = qualPct < 0.40 ? 1.0 : 0.35;
+
+    var stages = [
+      { key: 'missed', loss: missedLoss * 1.0 },
+      { key: 'qual', loss: qualLoss * qualWeight },
+      { key: 'close', loss: closeLoss * 1.0 },
+    ];
+    if (estimateOn) stages.push({ key: 'booking', loss: bookingLoss * 1.0 });
+    stages.sort(function(a, b) { return b.loss - a.loss; });
+    var primary = stages[0];
+
+    // ── CHECK IF ALL HEALTHY ──
+    var allHealthy = missedPct <= 0.05 && qualPct >= 0.65 && closePct >= 0.55 && (!estimateOn || bookingPct >= 0.65);
+
+    var diagHtml = '';
+
+    if (allHealthy) {
+      diagHtml += '<div class="diagnosis-item" style="background:#F0FAF3;border-left:4px solid #1A5C2E;">' +
+        '<div class="diagnosis-dot" style="background:#1A5C2E;"></div>' +
+        '<div>' +
+        '<div class="diagnosis-item-title" style="color:#1A5C2E;font-size:14px;">Revenue Flow is Structurally Healthy</div>' +
+        '<div class="diagnosis-item-body">Your revenue chain is operating within a healthy range across all major stages. ' +
+        'Missed calls are controlled, qualification is strong, and close rate is within expected performance. ' +
+        'At this point, growth is less about fixing leaks and more about increasing total call volume while maintaining these conversion levels.</div>' +
+        '</div></div>';
+      $('diagnosis-body').innerHTML = diagHtml;
+      return;
+    }
+
+    // ── PRIMARY REVENUE LEAK ──
+    var primaryHtml = '<div class="diagnosis-item" style="background:#FFF5F5;border-left:4px solid #7B0000;">' +
+      '<div class="diagnosis-dot red"></div>' +
+      '<div>';
+
+    if (primary.key === 'missed') {
+      primaryHtml += '<div class="diagnosis-item-title" style="color:#7B0000;font-size:14px;">Primary Revenue Leak: Missed Calls</div>' +
+        '<div class="diagnosis-item-body">' +
+        'Revenue is leaving your business before a conversation even happens.<br><br>' +
+        'You are missing approximately <strong>' + fmt(Math.round(missedCalls)) + ' calls per month</strong>. Each call is worth about <strong>' + fmtDollarFull(vpc) + '</strong>.<br><br>' +
+        'That means roughly <strong>' + fmtDollarFull(missedLoss) + '/month</strong> — <strong>' + fmtDollarFull(annualMissedLoss) + '/year</strong> is being lost before you ever speak to the customer.<br><br>' +
+        'This is the largest revenue gap in your business right now. This is happening whether it is being tracked or not.' +
+        '</div>';
+
+    } else if (primary.key === 'qual') {
+      primaryHtml += '<div class="diagnosis-item-title" style="color:#7B0000;font-size:14px;">Primary Revenue Leak: Qualification Rate</div>' +
+        '<div class="diagnosis-item-body">' +
+        'Revenue is leaking during the first conversation.<br><br>' +
+        'Only <strong>' + fmt(qualPct*100,0) + '%</strong> of your answered calls are real buyers. That means a large portion of time and effort is being spent on calls that were never going to become jobs.<br><br>' +
+        'Based on current numbers, approximately <strong>' + fmtDollarFull(qualLoss) + '/month</strong> is being lost at this stage.<br><br>' +
+        'This is currently the largest revenue gap in your business — not because of percentage alone, but because it represents the greatest dollar loss in your revenue chain.<br><br>' +
+        'If this stage improved, it would create the single largest increase in monthly revenue across your entire business.<br><br>' +
+        'This is where the most money is being left on the table right now.' +
+        '</div>';
+
+    } else if (primary.key === 'booking') {
+      primaryHtml += '<div class="diagnosis-item-title" style="color:#7B0000;font-size:14px;">Primary Revenue Leak: Estimate Booking</div>' +
+        '<div class="diagnosis-item-body">' +
+        'Qualified opportunities are not turning into scheduled work.<br><br>' +
+        'Only <strong>' + fmt(bookingPct*100,0) + '%</strong> of qualified calls are booking estimates.<br><br>' +
+        'Real buying intent is dropping off between the call and the calendar.<br><br>' +
+        'At current numbers, approximately <strong>' + fmtDollarFull(bookingLoss) + '/month</strong> is being lost at this stage.<br><br>' +
+        'This is the largest revenue gap in your business right now.' +
+        '</div>';
+
+    } else {
+      primaryHtml += '<div class="diagnosis-item-title" style="color:#7B0000;font-size:14px;">Primary Revenue Leak: Close Rate</div>' +
+        '<div class="diagnosis-item-body">' +
+        'Revenue is leaking after the estimate stage.<br><br>' +
+        'You are closing <strong>' + fmt(closePct*100,0) + '%</strong> of qualified opportunities, meaning a significant portion of potential jobs are not converting.<br><br>' +
+        'These are not cold leads. These are already qualified opportunities that reached the decision stage.<br><br>' +
+        'At current volume, approximately <strong>' + fmtDollarFull(closeLoss) + '/month</strong> is being lost at this stage.<br><br>' +
+        'This is currently the largest revenue gap in your business.' +
+        '</div>';
+    }
+
+    primaryHtml += '</div></div>';
+    diagHtml += primaryHtml;
+
+    // ── SUPPORTING ITEMS (2 MAX, SKIP PRIMARY) ──
+    var supporting = [];
+
+    if (primary.key !== 'missed' && missedPct > 0.05) {
+      supporting.push({
+        color: missedPct > 0.1 ? 'red' : 'gold',
+        title: 'Missed Calls — Revenue is leaving before a conversation happens',
+        body: '<strong>' + fmt(Math.round(missedCalls)) + ' calls per month</strong> go unanswered. Each call is worth <strong>' + fmtDollarFull(vpc) + '</strong>.<br><br>' +
+          'That is <strong>' + fmtDollarFull(missedLoss) + '/month</strong> — <strong>' + fmtDollarFull(annualMissedLoss) + '/year</strong> not being captured.<br><br>' +
+          'This loss occurs before any sales process begins and represents immediate, recoverable revenue.'
+      });
+    }
+
+    if (primary.key !== 'qual' && qualPct < 0.65) {
+      supporting.push({
+        color: qualPct < 0.5 ? 'red' : 'gold',
+        title: 'Qualification Rate — Below optimized range',
+        body: '<strong>' + fmt(qualPct*100,0) + '%</strong> of answered calls are becoming real opportunities.<br><br>' +
+          'Strong-performing service businesses typically operate closer to 65%+.<br><br>' +
+          'The gap represents missed efficiency in turning calls into actual revenue.'
+      });
+    }
+
+    if (estimateOn && primary.key !== 'booking' && bookingPct < 0.65) {
+      supporting.push({
+        color: bookingPct < 0.5 ? 'red' : 'gold',
+        title: 'Estimate Booking — Drop-off between interest and scheduling',
+        body: 'Only <strong>' + fmt(bookingPct*100,0) + '%</strong> of qualified calls are booking estimates.<br><br>' +
+          'This indicates friction between initial interest and taking the next step.<br><br>' +
+          'Improving this stage directly increases how much demand reaches a decision point.'
+      });
+    }
+
+    if (primary.key !== 'close' && closePct < 0.55) {
+      supporting.push({
+        color: closePct < 0.45 ? 'red' : 'gold',
+        title: 'Close Rate — Within range, but not fully captured',
+        body: 'You are closing <strong>' + fmt(closePct*100,0) + '%</strong> of qualified opportunities.<br><br>' +
+          'This is functional, but below the level where revenue is fully maximized.<br><br>' +
+          'Because these are already qualified leads, even small improvements at this stage create direct and compounding revenue gains.'
+      });
+    }
+
+    supporting = supporting.slice(0, 2);
+
+    for (var i = 0; i < supporting.length; i++) {
+      var it = supporting[i];
+      diagHtml += '<div class="diagnosis-item">';
+      diagHtml += '<div class="diagnosis-dot ' + it.color + '"></div>';
+      diagHtml += '<div>';
+      diagHtml += '<div class="diagnosis-item-title">' + it.title + '</div>';
+      diagHtml += '<div class="diagnosis-item-body">' + it.body + '</div>';
+      diagHtml += '</div></div>';
+    }
+
+    $('diagnosis-body').innerHTML = diagHtml;
+  }
+
+  // ── SIMULATOR ──
+  function updateSimulator() {
+    if (!window._baseline) return;
+    var b = window._baseline;
+
+    var simMissedPct = parseInt($('sim-missed').value) / 100;
+    var simClose = parseInt($('sim-close').value) / 100;
+    var simTicket = parseInt($('sim-ticket').value);
+
+    $('sim-missed-val').textContent = fmt(simMissedPct*100,0) + '%';
+    $('sim-close-val').textContent = fmt(simClose*100,0) + '%';
+    $('sim-ticket-val').textContent = '$' + fmt(simTicket);
+
+    var simAnswered = b.totalCalls * (1 - simMissedPct);
+    var simQual = simAnswered * b.qualPct;
+    var simBooked = b.estimateOn ? simQual * b.bookingPct : simQual;
+    var simClosed = simBooked * simClose;
+    var simRevenue = simClosed * simTicket;
+
+    // Delta is always >= 0 because sliders are clamped to improvement-only
+    var delta = Math.max(0, simRevenue - b.monthlyRevenue);
+
+    animateVal($('sim-revenue'), fmtDollarFull(simRevenue));
+    var deltaEl = $('sim-delta');
+    animateVal(deltaEl, '+' + fmtDollarFull(delta) + '/mo gained');
+    deltaEl.classList.add('positive');
+  }
+
+  // ── SLIDER EVENTS ──
+  ['sim-missed', 'sim-close', 'sim-ticket'].forEach(function(id) {
+    $(id).addEventListener('input', updateSimulator);
+  });
+
+  // ── INPUT EVENTS ──
+  ['total-calls','missed-rate','qual-rate','booking-rate','close-rate','avg-ticket'].forEach(id => {
+    $(id).addEventListener('input', calculate);
+    $(id).addEventListener('change', calculate);
+  });
+
+  // ── INIT ──
+  calculate();
+</script>
+
+</body>
+</html>
